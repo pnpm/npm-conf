@@ -68,4 +68,9 @@ module.exports = (opts, types, defaults) => {
 	return conf;
 };
 
-module.exports.defaults = Object.assign({}, _defaults.defaults);
+Object.defineProperty(module.exports, 'defaults', {
+	get() {
+		return _defaults.defaults;
+	},
+	enumerable: true
+})
