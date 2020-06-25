@@ -12,7 +12,7 @@
 		"node": ">=10"
 	},
 	"scripts": {
-		"prepublish": "node lib/make.js",
+		"prepublish": "node lib/make.js && tsc -p lib/tsconfig.make-out.json",
 		"test": "jest"
 	},
 	"files": [
@@ -32,11 +32,13 @@
 		"config-chain": "^1.1.11"
 	},
 	"devDependencies": {
+		"@types/node": "^14.0.14",
 		"babel-generator": "^6.24.1",
 		"babel-traverse": "^6.24.1",
 		"babylon": "^6.17.1",
 		"eslint-import-resolver-node": "^0.3.2",
 		"jest": "^25.1.0",
-		"npm": "^5.0.4"
+		"npm": "^5.0.4",
+		"typescript": "^3.9.6"
 	}
 }
