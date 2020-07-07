@@ -3,3 +3,12 @@ node_js:
   - '14'
   - '12'
   - '10'
+
+before_install:
+  - curl -L https://unpkg.com/@pnpm/self-installer | node
+
+install:
+  - pnpm install
+
+script:
+  - pnpm test
