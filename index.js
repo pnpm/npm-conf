@@ -17,8 +17,8 @@ module.exports = (opts, types, defaults) => {
 		try {
 			npmPath = require.resolve('npm', {paths: paths.slice(-1)});
 		} catch (error) {
-			// Error will be thrown if module cannot be found.
-			// We should ignore that error.
+			// If npm module cannot be found, add warning about adding global config to overwrite builtin config
+			warnings.push('Load npm builtin configs failed, you can use "pnpm config ls" to show builtin configs. And then use "pnpm config --global set <key> <value>" to migrate configs from builtin to global.');
 		}
 
 		if (npmPath) {
