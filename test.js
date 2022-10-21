@@ -25,12 +25,9 @@ test('mirror npm defaults', () => {
 
 
 test('npm builtin configs require failed', async () => {
-	const expected = [
-		expect.stringMatching(/Load npm builtin configs failed/),
-	];
 
 	// In the scope of jest, require.resolve.paths('npm') cannot reach global npm path by default
-	const { warnings } = m();
+	const { failedToLoadBuiltInConfig } = m();
 	
-	expect(warnings).toEqual(expect.arrayContaining(expected));
+	expect(failedToLoadBuiltInConfig).toBeTruthy();
 })

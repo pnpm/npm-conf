@@ -9,6 +9,7 @@ module.exports = (opts, types, defaults) => {
 
 	conf.add(Object.assign({}, opts), 'cli');
 	const warnings = [];
+	let failedToLoadBuiltInConfig = false;
 
 	if (require.resolve.paths) {
 		const paths = require.resolve.paths('npm');
@@ -17,8 +18,9 @@ module.exports = (opts, types, defaults) => {
 		try {
 			npmPath = require.resolve('npm', {paths: paths.slice(-1)});
 		} catch (error) {
-			// If npm module cannot be found, add warning about adding global config to overwrite builtin config
-			warnings.push('Load npm builtin configs failed, you can use "pnpm config ls" to show builtin configs. And then use "pnpm config --global set <key> <value>" to migrate configs from builtin to global.');
+			// Error will be thrown if module cannot be found.
+			// Update the flag while loading builtin config failed.
+			failedToLoadBuiltInConfig = true;
 		}
 
 		if (npmPath) {
@@ -69,6 +71,7 @@ module.exports = (opts, types, defaults) => {
 	return {
 		config: conf,
 		warnings: warnings.filter(Boolean),
+		failedToLoadBuiltInConfig,
 	};
 };
 
