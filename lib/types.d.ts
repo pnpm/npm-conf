@@ -79,6 +79,7 @@ export var types: {
     production: BooleanConstructor;
     progress: BooleanConstructor;
     proxy: (boolean | typeof import("url") | null)[];
+    provenance: BooleanConstructor;
     'read-only': BooleanConstructor;
     'rebuild-bundle': BooleanConstructor;
     registry: (typeof import("url") | null)[];
