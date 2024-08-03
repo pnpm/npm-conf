@@ -1,6 +1,6 @@
 {
 	"name": "@pnpm/npm-conf",
-	"version": "2.2.2",
+	"version": "2.3.0",
 	"description": "Get the npm config",
 	"license": "MIT",
 	"repository": "pnpm/npm-conf",
