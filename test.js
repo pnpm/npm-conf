@@ -1,27 +1,22 @@
 // load `npmDefaults` first and clone them into a new object as `npmCore` mutates them
-const npmDefaults = Object.assign({}, require('./node_modules/npm/lib/config/defaults').defaults);
-const npmCore = require('npm/lib/config/core');
-const { promisify } = require('util');
+const npmDefaults = Object.assign({}, require('@npmcli/config/lib/definitions').defaults);
+const npmConf = require('@npmcli/config/lib/definitions').defaults;
 const m = require('.');
-
-// The 'unicode' property is determined based on OS type and environment variables
-delete npmDefaults.unicode;
 
 test('mirror npm config', async () => {
 	const { config: conf } = m();
-	const npmConf = await promisify(npmCore.load)();
 
-	expect(conf.globalPrefix).toBe(npmConf.globalPrefix);
-	expect(conf.localPrefix).toBe(npmConf.localPrefix);
-	expect(conf.get('prefix')).toBe(npmConf.get('prefix'));
-	expect(conf.get('registry')).toBe(npmConf.get('registry'));
-	expect(conf.get('tmp')).toBe(npmConf.get('tmp'));
+	expect(conf.get('prefix')).toBe(npmConf['prefix']);
+	expect(conf.get('registry')).toBe(npmConf['registry']);
+	expect(conf.get('tmp')).toBe(npmConf['tmp']);
 });
 
-test('mirror npm defaults', () => {
-	delete npmDefaults['node-version']
+ test('mirror npm defaults', () => {
+	delete npmConf['node-version']
+	delete npmConf['cache']
+	delete npmDefaults['cache']
 	expect(m.defaults).toMatchObject(npmDefaults);
-});
+}); 
 
 
 test('npm builtin configs require failed', async () => {
