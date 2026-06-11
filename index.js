@@ -35,8 +35,27 @@ module.exports = (opts, types, defaults) => {
 	conf.addEnv();
 	conf.loadPrefix();
 
+	// SECURITY: The `project` and `workspace` .npmrc files added to the config
+	// chain below are repository-controlled. They must NOT be able to choose
+	// which files are loaded as the trusted `user` and `global` config sources.
+	// `userconfig`, `globalconfig` and `prefix` decide those destinations, so a
+	// project/workspace .npmrc could otherwise set e.g. `userconfig=.evil` and
+	// have an attacker-supplied, repo-shipped file loaded as trusted `user`
+	// config — which downstream consumers exempt from untrusted-env-expansion
+	// filtering and which may set `tokenHelper` — leaking environment secrets.
+	// Resolve those destinations now, from the trusted layers only (cli, env,
+	// builtin, defaults), before the project/workspace layers are pushed.
+	const trustedUserconfig = conf.get('userconfig');
+	const trustedPrefix = conf.get('prefix');
+	if (trustedPrefix) {
+		const etc = path.resolve(trustedPrefix, 'etc');
+		conf.root.globalconfig = path.resolve(etc, 'npmrc');
+		conf.root.globalignorefile = path.resolve(etc, 'npmignore');
+	}
+	const trustedGlobalconfig = conf.get('globalconfig');
+
 	const projectConf = path.resolve(conf.localPrefix, '.npmrc');
-	const userConf = conf.get('userconfig');
+	const userConf = trustedUserconfig;
 
 	if (!conf.get('global') && projectConf !== userConf) {
 		warnings.push(conf.addFile(projectConf, 'project'));
@@ -51,15 +70,9 @@ module.exports = (opts, types, defaults) => {
 		warnings.push(conf.addFile(workspaceConf, 'workspace'));
 	}
 
-	warnings.push(conf.addFile(conf.get('userconfig'), 'user'));
+	warnings.push(conf.addFile(trustedUserconfig, 'user'));
 
-	if (conf.get('prefix')) {
-		const etc = path.resolve(conf.get('prefix'), 'etc');
-		conf.root.globalconfig = path.resolve(etc, 'npmrc');
-		conf.root.globalignorefile = path.resolve(etc, 'npmignore');
-	}
-
-	warnings.push(conf.addFile(conf.get('globalconfig'), 'global'));
+	warnings.push(conf.addFile(trustedGlobalconfig, 'global'));
 	conf.loadUser();
 
 	const caFile = conf.get('cafile');
